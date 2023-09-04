@@ -1,0 +1,64 @@
+---
+title: "Assignment1"
+output:
+  pdf_document: default
+  html_document: default
+date: "2023-09-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+```
+
+## What makes a superbowl ad popular?
+
+#### This csv file has a list of the top 10 brands with the most advertisments in the superbowl from 2000 to 2020. Based on this data, fivethirtyeight workers have come up with different categories that encapsulate what alot of the popular super bowl ads have in common. And the formula for their success may shock you. Article [here](https://projects.fivethirtyeight.com/super-bowl-ads/)
+
+```{r}
+theUrl <- "https://raw.githubusercontent.com/fivethirtyeight/superbowl-ads/main/superbowl-ads.csv"
+superbowl <- read.table(file= theUrl, header=TRUE, sep=",")
+```
+
+## Trimming Down the data
+#### There are a few different categories that is used as an identifier for the superbowl ads. I'm going to make a table that holds just two of what I find to be the most interesting categories and compare those 
+```{r}
+subset_sb <- superbowl %>%
+  select(year, brand, superbowl_ads_dot_com_url, youtube_url, funny, celebrity, use_sex)
+
+```
+## Do ads with Celebrities tend to be funnier?
+### By performing a frequency table, I can create a table to show the counts of ads with and without celbs that are considered funny or not. Note the rows determines if the advertisment had a celebrity in it, and the columns reperesnt if the ad was considered funny. So 123 ads that didn't have celbrities were funny
+```{r}
+freq_table <- table(subset_sb$celebrity, subset_sb$funny)
+
+freq_table_df <- as.data.frame.matrix(freq_table)
+
+colnames(freq_table_df) <- c("Celebrities", "Funny")
+
+ggplot(data = freq_table_df, aes(x = Celebrities, fill = factor(Funny), group = factor(Funny))) +
+  geom_bar(position = "fill") +
+  labs(x = "Presence of Celebrities", y = "Proportion") +
+  scale_fill_manual(values = c("TRUE" = "green", "FALSE" = "red")) +
+  theme_minimal()
+```
+#### Since both bars appear to be gray this means there is no significant difference between the distribtion of each category. In other words the presence or absence of celebrities does not strongly influence wether or not an ad is funny.
+
+## How many of these ads use sex?
+#### By createing a subset of the data, by converting the character data types to a logical data type so we can add the amount of ads that have the use_sex column as TRUE
+```{r}
+ subset_sb$use_sex <- as.logical(subset_sb$use_sex)
+ads_with_sex <- sum(subset_sb$use_sex)
+ads_with_sex
+```
+
+## Conclusion
+
+#### The Data provided shows me that 63 ads of the 244 or 26% of adds have some form of sex appeal in their advertisments. which is slightly over one in every four
+
+## Recommendations
+#### In regards to the question of wether or not ads that have celebrities tend to be funny, If I were able to add a column that had the amount of revune increase after the add was released or some type of quantifiable data that shows how well the advertisement did, I would be able to see if funny celeberity included ads are more effective, so I can know how to create my advertisements in the future
+
+
+
