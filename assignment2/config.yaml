@@ -1,5 +1,5 @@
-dbname: replace_this_with_your_dbname
-host: replace_this_with_your_host
-port: replace_this_with_your_port
+dbname: test
+host: localhost
+port: 3306
 user: root
 password: replace_this_with_your_password
