@@ -1,0 +1,5 @@
+dbname: replace_this_with_your_dbname
+host: replace_this_with_your_host
+port: replace_this_with_your_port
+user: root
+password: replace_this_with_your_password
