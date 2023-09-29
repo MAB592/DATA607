@@ -1,0 +1,80 @@
+---
+title: "Assignment5"
+output:
+  pdf_document: default
+  html_document: default
+date: "2023-09-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+```
+
+
+```{r}
+untidy_data <- "https://raw.githubusercontent.com/Kingtilon1/DATA607/main/assignment5/flights.csv"
+untidy <- data.frame(read.csv(untidy_data, header=TRUE, sep="\t"))
+untidy
+```
+
+I am going to give the table a name
+```{r}
+colnames(untidy)[1] <- "Airline"
+colnames(untidy)[2] <-"Tardiness"
+```
+
+I will now drop the row that has the NA values
+```{r}
+untidy <- drop_na(untidy)
+```
+
+fill the empty rows with NA
+```{r}
+untidy[untidy==""] <-NA
+tidy <- untidy %>% fill(Airline)
+tidy
+```
+
+using the pivot_longe function to reshape the data frame to a long format so that the columns from 3 to 7 are all organized under one column, as is their respective values
+```{r}
+tidy <- pivot_longer(tidy, cols = 3:7, names_to = "city", values_to = "Frequency")
+```
+
+replacing all the . in between the cities
+```{r}
+tidy$city <- str_replace_all(tidy$city, "\\.", " ")
+tidy
+```
+
+By calclating the total amount of flights and the total amount of delayed, and ontime flight, I can calculate the on time rate and the delayed rate for each airline 
+```{r}
+airline_percentage <-
+  tidy %>% 
+    group_by(Airline) %>%
+      summarise(
+        num_flights = sum(Frequency),
+        num_delays = sum(ifelse(Tardiness=='delayed', Frequency, 0))
+      )
+
+airline_percentage <- 
+  airline_percentage %>%
+    mutate(
+        num_on_time = num_flights - num_delays,
+        delay_rate = num_delays / num_flights,
+        on_time_rate = (num_flights - num_delays) / num_flights
+    ) %>%
+      arrange(delay_rate)
+airline_percentage
+```
+
+
+## Conclusion: AM West on time rate : 89.1%, delayed rate: 10.8%. 
+
+## Alaska Airlines on time rate : 86.7%, delayed rate: 13.3%. 
+
+Alaska Airlines on time rate: 86.7 percent, delayed rate 13.2%
+Based off of this data, I can conclude, that on average, AM WEST Airlines is on time 3% more than Alaska airlines for a total of 89%.As well as the fact that AM WEST Airlines has a lower delay rate than Alaska Airlines which is also lower by 2 percent for a total of 11 percent if you round up. 
+
+
