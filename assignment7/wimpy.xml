@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <Data>
+  
   <Book>
     <Title>Diary of a Wimpy Kid: Rodrick Rules</Title>
     <Author>Jeff Kiney</Author>
@@ -17,4 +19,5 @@
     <Illustrator>Tony Shasteen</Illustrator>
     <Genre>Novel, Horror fiction, Dark fantasy</Genre>
   </Book>
+  
 </Data>
