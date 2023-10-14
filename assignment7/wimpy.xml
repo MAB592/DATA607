@@ -1,0 +1,20 @@
+<Data>
+  <Book>
+    <Title>Diary of a Wimpy Kid: Rodrick Rules</Title>
+    <Author>Jeff Kiney</Author>
+    <Illustrator>Jeff Kiney</Illustrator>
+    <Genre>Humor, Comedy, Young adult fiction</Genre>
+  </Book>
+  <Book>
+    <Title>Franny K. Stein</Title>
+    <Author>Jim Benton</Author>
+    <Illustrator>Jim Benton</Illustrator>
+    <Genre>Humor, Science fiction, Fiction</Genre>
+  </Book>
+  <Book>
+    <Title>The Talisman</Title>
+    <Author>Peter Straub, Stephen King</Author>
+    <Illustrator>Tony Shasteen</Illustrator>
+    <Genre>Novel, Horror fiction, Dark fantasy</Genre>
+  </Book>
+</Data>
