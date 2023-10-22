@@ -1,0 +1,125 @@
+---
+title: "Project3"
+output: html_document
+date: "2023-10-21"
+---
+To begin our analysis of the "world_salary" dataset, we'll start by loading the necessary R libraries for data manipulation and visualization:
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(RODBC)
+library(DBI)
+library(odbc)
+library(RMySQL)
+library(yaml)
+library(ggplot2)
+library(dplyr)
+```
+We are going to explore the monthly salary data from various countries all over the world, converted to USD. 
+```{r}
+config <- yaml::read_yaml("config.yaml")
+con <- dbConnect(
+  RMySQL::MySQL(),
+  dbname = config$dbname,
+  host = config$host,
+  port = config$port,
+  user = config$user,
+  password =  config$password
+)
+```
+
+```{r}
+query <- "SELECT * FROM project3.salary_data"
+world_salary <- dbGetQuery(con, query)
+```
+
+Let's take a look at the dataset to get a preliminary understanding:
+```{r}
+head(world_salary)
+```
+This snippet provides an overview of the dataset by showing the first few rows, including column names and sample data. 
+
+let's examine the dataset's structure to understand the data types and column names:
+```{r}
+str(world_salary)
+```
+ 
+ To get a more detailed description of the columns you can always go to the source [here](https://www.kaggle.com/datasets/zedataweaver/global-salary-data)
+ 
+### Data Tidying
+
+Now let's check for any missing values to see if any cleaning up is necessary before the analysis
+```{r}
+# Check for missing values in the entire dataset
+missing_values <- is.na(world_salary)
+
+# Summarize the number of missing values in each column
+col_missing_count <- colSums(missing_values)
+
+# Display columns with missing values
+colnames(world_salary)[col_missing_count > 0]
+```
+
+
+As we can see, there are no missing vales from the data set, there is however, an error in the column name for the different regions, which is currently continent_name, but since it includes place like the Caribbean and makes a distinction between northern america and North America, we will replace it with geographical region 
+```{r}
+colnames(world_salary)[colnames(world_salary) == "continent_name"] <- "geographical_region"
+```
+
+
+### Summary Statistics
+
+We will calculate and display summary statistics for the numerical columns in our dataset, which are "median_salary," "average_salary," "lowest_salary," and "highest_salary." This provides an overview of central tendencies and data distribution:
+```{r}
+summary(world_salary[, c("median_salary", "average_salary", "lowest_salary", "highest_salary")])
+```
+
+**Based off of this data, the first thing I noticed is that the lowest salary within the data set is $7.21 dollars a month. The average mean of the average salary column is $1,982 a month which means that the worlds average salary can possibly be around $1,982 a month**
+
+
+## Hypothesis testing
+
+I hypothesis that Northern America has a higher average salary than the rest of the worlds average
+
+
+Sampling distribution
+```{r}
+world_salary <- world_salary %>%
+  mutate(Northern_America = ifelse(geographical_region == "Northern America", "Yes", "No"))
+```
+
+```{r}
+world_salary <- world_salary %>% 
+  mutate(Northern_America = ifelse(world_salary$average_salary > 2500, "yes", "no")) %>%
+  na.exclude()
+ggplot(world_salary, aes(x=average_salary, y=Northern_America)) + geom_boxplot() + theme_bw()
+```
+Using a box plot, Northern America, which represents the U.S and Canada, has the highest median salary, along with the largest variability in salary wages, this makes sense, since the United states and Canada are known for having diverse income distributions.
+
+### To solidify my findings, I will calculate a 95% confidence interval for average salary 
+```{r}
+yes_group <- world_salary %>% filter(Northern_America == "yes")
+no_group <- world_salary %>% filter(Northern_America == "no")
+
+# Perform t-tests for 'Yes' and 'No' groups
+t_test_yes <- t.test(yes_group$average_salary)
+t_test_no <- t.test(no_group$average_salary)
+
+# Get the confidence intervals
+conf_interval_yes <- t_test_yes$conf.int
+conf_interval_no <- t_test_no$conf.int
+
+# Print the confidence intervals
+cat("95% Confidence Interval for 'Yes' (Northern America) Average Salary:", conf_interval_yes, "\n")
+cat("95% Confidence Interval for 'No' (Other Regions) Average Salary:", conf_interval_no, "\n")
+```
+## Conclusion
+Northern America (Yes): With 95% confidence, we estimate that the average salary in Northern America falls within the range of approximately $3,961.37 to $4,796.90. This suggests that the true average salary in Northern America is likely to be within this range.
+
+Other Regions (No): Similarly, with 95% confidence, we estimate that the average salary in other regions (outside Northern America) falls within the range of approximately $926.08 to $1,127.23. This indicates that the true average salary in other regions is likely to be within this range.
+
+### Each region box plot
+```{r}
+ggplot(data = world_salary, aes(x = geographical_region, y = median_salary)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Median Salaries by Continent")
+```
