@@ -243,11 +243,11 @@ obs_diff_median <- world_salary2 %>%
   filter(!is.na(median_salary), !is.na(cpi_130)) %>%
   specify(median_salary ~ cpi_130) %>%
   calculate(stat = "diff in means", order = c("yes", "no"))
+obs_diff_median
 ```
 
 
 ```{r}
-obs_diff_median
 null_dist %>%
   get_p_value(obs_stat = obs_diff_median, direction = "two_sided")
 ```
