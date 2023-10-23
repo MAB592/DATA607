@@ -6,15 +6,17 @@ date: "2023-10-21"
 To begin our analysis of the "world_salary" dataset, we'll start by loading the necessary R libraries for data manipulation and visualization:
 ```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
-library(RODBC)
-library(DBI)
-library(odbc)
 library(RMySQL)
 library(yaml)
 library(ggplot2)
 library(dplyr)
+library(tidyverse)
+library(infer)
+library(rvest)
 ```
-We are going to explore the monthly salary data from various countries all over the world, converted to USD. 
+### We are going to explore the monthly salary data from various countries all over the world, converted to USD. 
+
+Establishing a connection to the sql database
 ```{r}
 config <- yaml::read_yaml("config.yaml")
 con <- dbConnect(
@@ -43,7 +45,7 @@ let's examine the dataset's structure to understand the data types and column na
 str(world_salary)
 ```
  
- To get a more detailed description of the columns you can always go to the source [here](https://www.kaggle.com/datasets/zedataweaver/global-salary-data)
+To get a more detailed description of the columns you can always go to the source [here](https://www.kaggle.com/datasets/zedataweaver/global-salary-data)
  
 ### Data Tidying
 
@@ -60,9 +62,10 @@ colnames(world_salary)[col_missing_count > 0]
 ```
 
 
-As we can see, there are no missing vales from the data set, there is however, an error in the column name for the different regions, which is currently continent_name, but since it includes place like the Caribbean and makes a distinction between northern america and North America, we will replace it with geographical region 
+As we can see, there are no missing vales from the data set, there is however, an error in the column name for the different regions, which is currently continent_name, but since it includes place like the Caribbean and makes a distinction between northern america and North America, we will replace it with geographical region. Since we know that the salaries are monthly, we can also remove the wage_span column
 ```{r}
 colnames(world_salary)[colnames(world_salary) == "continent_name"] <- "geographical_region"
+world_salary <- world_salary %>% select(-wage_span)
 ```
 
 
