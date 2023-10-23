@@ -96,9 +96,11 @@ world_salary <- world_salary %>%
   na.exclude()
 ggplot(world_salary, aes(x=average_salary, y=Northern_America)) + geom_boxplot() + theme_bw()
 ```
+
 Using a box plot, Northern America, which represents the U.S and Canada, has the highest median salary, along with the largest variability in salary wages, this makes sense, since the United states and Canada are known for having diverse income distributions.
 
-### To solidify my findings, I will calculate a 95% confidence interval for average salary 
+### To solidify my findings, I will calculate a 95% confidence interval for average salary
+
 ```{r}
 yes_group <- world_salary %>% filter(Northern_America == "yes")
 no_group <- world_salary %>% filter(Northern_America == "no")
@@ -115,6 +117,7 @@ conf_interval_no <- t_test_no$conf.int
 cat("95% Confidence Interval for 'Yes' (Northern America) Average Salary:", conf_interval_yes, "\n")
 cat("95% Confidence Interval for 'No' (Other Regions) Average Salary:", conf_interval_no, "\n")
 ```
+
 ## Conclusion
 Northern America (Yes): With 95% confidence, we estimate that the average salary in Northern America falls within the range of approximately $3,961.37 to $4,796.90. This suggests that the true average salary in Northern America is likely to be within this range.
 
@@ -126,3 +129,127 @@ ggplot(data = world_salary, aes(x = geographical_region, y = median_salary)) +
   geom_boxplot() +
   labs(title = "Distribution of Median Salaries by Continent")
 ```
+
+## Part 2
+checking if the median salary is affected by the CPI (consumer price index)
+
+Looking at the data to check for the cases in the continent name
+```{r}
+unique(world_salary$geographical_region)
+```
+changing Northern America to America so it doesn't  intefere with or analysis 
+
+```{r}
+world_salary <- world_salary %>%
+  mutate(geographical_region = ifelse(geographical_region == "Northern America", "North America", geographical_region))
+```
+
+
+```{r}
+continent_stats <- world_salary %>%
+  group_by(geographical_region) %>%
+  summarize(
+    mean_salary = mean(median_salary),
+    median_salary = median(median_salary)
+  )
+print(continent_stats)
+```
+
+```{r}
+ggplot(world_salary, aes(x = reorder(geographical_region, -average_salary), y = average_salary)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Average Salaries by Continent",
+       x = "Continent", y = "Average Salary") +
+  theme_minimal() +
+  coord_flip()
+
+```
+
+now adding the cpi to our data frame using rvest to scrape from online data 
+
+```{r}
+link <- "https://www.economy.com/indicators/consumer-price-index-cpi"
+page <- read_html(link)
+
+name <-  page %>% 
+  html_nodes("#table-IALL a") %>% 
+  html_text()
+
+cpi <- page %>% 
+  html_nodes("#table-IALL td:nth-child(3) .pull-right") %>% 
+  html_text()
+
+cpi_data <- data.frame(Name = name, CPI = cpi)
+
+```
+
+Now joing the data to our world_salary data 
+
+```{r}
+world_salary2 <- world_salary
+
+world_salary2 <- world_salary2 %>%
+  mutate(country_name = trimws(tolower(country_name)))  
+
+# Clean the names in 'data' as well
+cpi_data <- cpi_data %>%
+  mutate(Name = trimws(tolower(Name)))  
+
+# Merge the data frames
+world_salary2 <- world_salary2 %>% 
+  left_join(cpi_data, by = c("country_name" = "Name"))
+
+# Print the first few rows of 'world_salary'
+head(world_salary2)
+```
+
+```{r}
+world_salary2 <- world_salary2 %>% 
+  mutate( cpi_130 = ifelse(world_salary2$CPI > 130, "yes", "no"))
+world_salary2
+```
+
+```{r}
+boxplot( median_salary~cpi_130 , data = world_salary2)
+```
+
+```{r}
+world_salary2 %>%
+  filter(!is.na(cpi_130)) %>%
+  group_by(cpi_130) %>%
+  summarise(mean_median_salary = mean(median_salary, na.rm = TRUE))
+
+
+```
+
+```{r}
+null_dist <- world_salary2 %>%
+  drop_na(cpi_130) %>%
+  specify(median_salary ~ cpi_130) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+
+null_dist
+```
+
+```{r}
+ggplot(data = null_dist, aes(x = stat)) +
+  geom_histogram()
+```
+
+```{r}
+obs_diff_median <- world_salary2 %>%
+  filter(!is.na(median_salary), !is.na(cpi_130)) %>%
+  specify(median_salary ~ cpi_130) %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+```
+
+
+```{r}
+obs_diff_median
+null_dist %>%
+  get_p_value(obs_stat = obs_diff_median, direction = "two_sided")
+```
+
+Since we have a p value of 0 we can reject the null hypothesis
