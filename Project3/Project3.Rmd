@@ -3,6 +3,7 @@ title: "Project3"
 output: html_document
 date: "2023-10-21"
 ---
+Tilon Bobb Mikhail Broomes
 To begin our analysis of the "world_salary" dataset, we'll start by loading the necessary R libraries for data manipulation and visualization:
 ```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -243,11 +244,11 @@ obs_diff_median <- world_salary2 %>%
   filter(!is.na(median_salary), !is.na(cpi_130)) %>%
   specify(median_salary ~ cpi_130) %>%
   calculate(stat = "diff in means", order = c("yes", "no"))
-obs_diff_median
 ```
 
 
 ```{r}
+obs_diff_median
 null_dist %>%
   get_p_value(obs_stat = obs_diff_median, direction = "two_sided")
 ```
