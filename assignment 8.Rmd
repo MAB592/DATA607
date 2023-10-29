@@ -1,0 +1,38 @@
+---
+title: "assignment8"
+output: html_document
+date: "2023-10-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(httr)
+library(jsonlite)
+```
+
+making the api request and storing the results in a  dataframe
+```{r}
+# Define the API URL with your specific endpoint and parameters
+api_url <- "https://api.nytimes.com/svc/books/v3/lists/best-sellers/history.json?api-key=8GkfuqeNdp08Sc1RtvRSxCP6DDwHgkof"
+
+# Make a GET request to the API
+response <- GET(api_url)
+
+json_data <- content(response, "text")
+
+json_object <- fromJSON(json_data)
+
+best_seller <- json_object$results
+
+head(best_seller)
+```
+
+just store the data without the na in it 
+```{r}
+# Assuming 'best_seller' is your original DataFrame
+# Create a new DataFrame without NAs
+cleaned_best_seller <- na.omit(best_seller)
+
+```
+
+
