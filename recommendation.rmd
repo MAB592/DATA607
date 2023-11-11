@@ -1,0 +1,35 @@
+---
+title: "TikTok Recommender System Scenario Design Analysis"
+output: html_document
+---
+
+# Organization-Level Scenario Design
+
+
+TikTok's primary business objectives include increasing user engagement, enhancing content discovery, and retaining a diverse user base.
+Users can be segmented based on demographics, interests, and usage patterns. Understanding these segments is crucial for tailoring content recommendations.
+TikTok categorizes content through trends, challenges, and tags. Analyzing how these are identified helps in recognizing patterns and popular content.
+They employ machine learning algorithms for content recommendation. One thing Tik Tok does is that they analaysze the users facial expressions products and other things to understand a videos content
+User interactions, such as likes, shares, and comments, play a pivotal role in shaping content recommendations. TikTok's algorithm adapts to user preferences based on these interactions.
+
+
+## User Experience
+Individual user experiences on TikTok are shaped by their viewing history, engagement patterns, and preferences. Personalizing the user experience is key to retaining and engaging users.
+
+## Personalization
+TikTok's recommender system should continuously evolve to reflect users' changing interests. Understanding how well TikTok adapts to individual preferences is crucial for personalized content delivery.
+
+## Privacy Considerations
+Ensuring user data privacy is paramount. TikTok needs to strike a balance between personalization and privacy, providing users with control over their data.
+
+# Reverse Engineering
+ The system begins by prompting users to select categories of interest upon sign-up, serving as an initial guide for content recommendations. In cases where users do not provide specific preferences, the system defaults to offering a feed of recent popular videos, taking into account the user's location and language.
+## App Interface
+Tik Toke interface gives the user control over what they see, as a user swipes they are instantly met with another video, if the user is looking for something specific they can utilize the search option
+Which not only gives you the option to search, you are provided with categories of different kinds of videos to watch
+## External Sources
+You can find out more on why tik toks ui is so good [here](https://careerfoundry.com/en/blog/ui-design/tiktok-ui/#:~:text=TikTok's%20UI%20gives%20the%20user,re%20shown%20by%20the%20app.)
+
+# Recommendations for Improvement
+One way that tik tok can be imporved is by being transparent in how they utilize their recomendation system so the user could be in more control of the content they see 
+They can also Ensure the recommender system introduces users to diverse content to avoid creating filter bubbles and promote a broader content experience.
