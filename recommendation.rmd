@@ -6,7 +6,7 @@ output: html_document
 # Organization-Level Scenario Design
 
 
-TikTok's primary business objectives include increasing user engagement, enhancing content discovery, and retaining a diverse user base.
+TikTok's primary business objectives include increasing user engagement, enhancing content discovery, and retaining a diverse user base, although it is a majority of youung people who utilize their application.
 Users can be segmented based on demographics, interests, and usage patterns. Understanding these segments is crucial for tailoring content recommendations.
 TikTok categorizes content through trends, challenges, and tags. Analyzing how these are identified helps in recognizing patterns and popular content.
 They employ machine learning algorithms for content recommendation. One thing Tik Tok does is that they analaysze the users facial expressions products and other things to understand a videos content
