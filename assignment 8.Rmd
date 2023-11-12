@@ -1,6 +1,8 @@
 ---
 title: "assignment8"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 date: "2023-10-29"
 ---
 
@@ -35,4 +37,37 @@ cleaned_best_seller <- na.omit(best_seller)
 
 ```
 
+## Data analysis 
+```{r}
+head(cleaned_best_seller)
+```
 
+```{r}
+# Show summary statistics for numeric columns
+cleaned_best_seller$price <- as.numeric(cleaned_best_seller$price)
+summary(cleaned_best_seller$price)
+```
+
+```{r}
+# Show unique values in categorical columns
+unique_titles <- unique(cleaned_best_seller$title)
+unique_publishers <- unique(cleaned_best_seller$publisher)
+
+cat("Unique Titles:\n")
+print(unique_titles)
+
+cat("Unique Publishers:\n")
+print(unique_publishers)
+
+```
+
+### after createting a bar plot for the distribution of publishers, it seems like Harlequin Mira has the highest distribution amongst the pther publishers, meaning that there are more books associated with that publisher
+```{r}
+# Create a bar plot for the 'publisher' column
+barplot(table(cleaned_best_seller$publisher), main="Distribution of Publishers")
+
+# Create a histogram for the 'price' column
+hist(cleaned_best_seller$price, main="Distribution of Prices", xlab="Price")
+
+```
+### We can also note that 0 dollars is the mosty frequent price amongst all of the books being published
