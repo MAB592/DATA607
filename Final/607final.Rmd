@@ -1,5 +1,5 @@
 ---
-title: "607final"
+title: "Property sales analysis"
 output: html_document
 date: "2023-11-28"
 ---
@@ -54,6 +54,12 @@ Store the 2021 csv dataframe in mongoddb atlas
 uri <- "mongodb+srv://bobbtilon:I8aGyfSubO4lteBf@cluster0.t25lesh.mongodb.net/cluster0?retryWrites=true&w=majority"
 conn <- mongo(collection = "final", db = "cluster0", url = uri)
 property_sales_2021 <-conn$find()
+```
+
+**If connection to mongodb doesn't work do the following and delete the above codechunk**
+```{r}
+## url <- "https://raw.githubusercontent.com/Kingtilon1/DATA607/main/Final/2021_property_sales.csv"
+## property_sales_2021 <- read.csv(url)
 ```
 
 ## Is there a trend in the average property sales data from 2018 to 2022?
