@@ -74,7 +74,7 @@ clean_and_standardize <- function(df) {
   return(df)
 }
 
-# Assuming property_sales_2020 and property_sales_2021 are your data frames
+
 property_sales_2020 <- clean_and_standardize(property_sales_2020)
 property_sales_2021 <- clean_and_standardize(property_sales_2021)
 ```
