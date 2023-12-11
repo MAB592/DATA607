@@ -146,5 +146,115 @@ ggplot(average_prices, aes(x = Year, y = avg_sale_price)) +
   theme_minimal()
 ```
 
+
+Here I want to showcase the location of some of these properties on Google maps using their API's. Here is the API key that I will be using. The R packages that I will be using are the tidygeocoder (This is a package developed and by Jesse Cambon) and ggmap.
+
+```{r}
+
+register_google(key = 'AIzaSyBYwHOEJV9s_I0ykfOixB7BBAw887Qo03w')
+
+api_key = 'AIzaSyBYwHOEJV9s_I0ykfOixB7BBAw887Qo03w'
+```
+
+Here I want to add some more information to the Address because I will need it in order to get the accurate longitude and latitudes 
+
+```{r}
+
+combined_df <- combined_df %>% 
+mutate("Address" = paste(Address, ", Milwaukee, WI"))
+addresses <- tibble('Address' = combined_df$Address)
+head(addresses)
+
+
+```
+
+Here I will only be using the first 100 addresses because the overall dataset is close to 32,000 observations. I will be using the tidygeocoder package in order to use the address to get the longitude and latitude.
+
+
+```{r}
+
+addresses_subset <- combined_df[1:100, "Address"]
+
+addresses <- tibble(Address = addresses_subset)
+
+lat_longs <- addresses %>%
+  mutate_geocode(location = Address, method = 'osm', output = 'latlon', provider = 'osm')
+
+head(lat_longs)
+
+```
+
+
+```{r}
+MI <- get_map(location = c(lon = mean(lat_longs$lon), lat = mean(lat_longs$lat)),
+               zoom = 13)
+
+ggmap(MI) +
+  geom_point(data = lat_longs, aes(x = lon, y = lat), color = "red", size = 1) +
+  ggtitle("Properties on Map")
+
+```
+
+
+```{r}
+MI <- get_map(location = c(lon = mean(lat_longs$lon), lat = mean(lat_longs$lat)), maptype= 'hybrid' , source="google", api_key = api_key, zoom=13)
+
+ggmap(MI) +
+  geom_point(data = lat_longs, aes(x = lon, y = lat), color = "cyan", size = 1) +
+  ggtitle("Geocoded Addresses on Map")
+```
+I want to now test commercial property between 2020 and 2021. I will be do some hypothesis testing my hypothesis will be as follows:
+
+H0 - There is no difference between the mean sale prices in year 2020 and 2021
+HA - There is a difference between the mean sale prices in year 2020 and 2021 
+
+```{r}
+
+commercial_prop<- combined_df %>% 
+  filter(PropType == 'Commercial') 
+head(commercial_prop)
+```
+
+Now I just want the sale year so that it is easier to separate these groups 
+
+```{r}
+commercial_prop2 <- commercial_prop %>% 
+  mutate("Sale_year" = str_extract(commercial_prop$Sale_date,"\\b20\\d{2}\\b" ))
+
+
+
+```
+
+
+```{r}
+com_2021 <- commercial_prop2 %>% 
+  filter(Sale_year == "2020") %>%
+  mutate(Sale_price = as.numeric(gsub("\\$|,", "", str_extract(Sale_price, "\\$\\d+"))))
+
+com_2020 <- commercial_prop2 %>% 
+  filter(Sale_year == "2021") %>% 
+  mutate(Sale_price = as.numeric(gsub("\\$|,", "", str_extract(Sale_price, "\\$\\d+"))))
+
+print(com_2020)
+
+```
+
+I will conduct an independent 
+```{r}
+t_test <- t.test(com_2021$Sale_price, com_2020$Sale_price, var.equal = TRUE)
+
+# Print the result
+cat("Two-sample independent t-test with equal variances:\n")
+print(t_test)
+
+```
+as you can see our p value is 0.9625 so this enough to reject our null hypothesis.
+
+```{r}
+ggplot(rbind(com_2020,com_2021), aes(x = Sale_year, y = Sale_price)) + 
+  geom_boxplot()
+```
+As we can see the median price of the commercial property is higher than that of 2021.
+
 ## Conclusion
 In this linear regression analysis, we fitted a model to explore the relationship between the year and average sale prices. The coefficients for 'Year2', 'Year3', 'Year4', and 'Year5' were found to be highly statistically significant (p-value < 0.001), indicating an upward trend in average sale prices over the years. The high R-squared values close to 1 suggest that the model effectively explains a substantial proportion of the variance in average sale prices based on the 'Year' variable. Overall, the results provide compelling evidence for a significant and positive trend in average sale prices from 2018 to 2022, implying a consistent increase in property values over this period. This confirms my hypothessi that there 
